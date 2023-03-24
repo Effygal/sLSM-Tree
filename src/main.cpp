@@ -32,6 +32,8 @@
 #include "bloom.hpp"
 #include "hashMap.hpp"
 #include "lsm.hpp"
+#include <chrono>
+using namespace std::chrono;
 
 
 using namespace std;
@@ -778,10 +780,17 @@ void queryLine(LSM<int, int> &lsm, const string &line, vector<string> &strings){
             int v;
             bool found = lsm.lookup(lk, v);
             if (found) {
-                cout << v;
+                ;
+            } else {
+                ;
             }
+            // if (found) {
+            //     cout << v;
+            // } else {
+            //     cout << "not found";
+            // }
             
-            cout << endl;
+            // cout << endl;
         }
             break;
         case 'r':{
@@ -828,29 +837,39 @@ int main(int argc, char *argv[]){
     
     auto lsm = LSM<int, int>(800,20,1.0,0.00100,1024,20);
     auto strings = vector<string>(3);
-    if (argc == 2){
-    cout << "LSM Tree DSL Interactive Mode" << endl;
-        while (true){
-            cout << "> ";
-            string input;
-            getline(cin, input);
-            queryLine(lsm, input, strings);
+    // if (argc == 2){
+    // cout << "LSM Tree DSL Interactive Mode" << endl;
+    
+    //     while (true){
+    //         cout << "> ";
+    //         string input;
+    //         getline(cin, input);//read stdin
+    //         queryLine(lsm, input, strings);//
+    //     }
+    // }
+    // else{
+    string line;
+    ifstream f;
+
+    for (int i = 1; i < argc; ++i){
+        f.open(argv[i]);
+        
+        if(!f.is_open()) {
+            perror("Error open");
+            exit(EXIT_FAILURE);
         }
-    }
-    else{
-        string line;
-        ifstream f;
-        for (int i = 1; i < argc; ++i){
-            f.open(argv[i]);
-            
-            if(!f.is_open()) {
-                perror("Error open");
-                exit(EXIT_FAILURE);
-            }
-            while(getline(f, line)) {
-                queryLine(lsm, line, strings);
-            }
+        cout << argv[i] << endl;
+        
+        auto start = high_resolution_clock::now();
+        while(getline(f, line)) {
+            // cout << line << endl;
+            queryLine(lsm, line, strings);
         }
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << duration.count() << endl;
+        f.close();
+        // }
     }
 
 
